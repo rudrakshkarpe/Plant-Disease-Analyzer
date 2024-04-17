@@ -11,7 +11,7 @@ Analyzer
         <div class="row mb-5 text-center text-white">
             <div class="col-lg-10 mx-auto">
                 <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(232, 236, 232);"><b> ☘️ Plant Disease Analyzer ☘️ </b></h1>
-                <p class="lead" style="font-weight: 500;color: rgb(254, 255, 255);">Let AI Engine Will Help You To Detect Disease</p>
+                <p class="lead" style="font-weight: 500;color: rgb(254, 255, 255);">Please upload your plant image here</p>
             </div>
         </div>
         <!-- End -->
@@ -32,8 +32,8 @@ Analyzer
             </div>
             <div class="col mx-auto">
                 <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;"><img
-                        src="https://www.pngjoy.com/pngl/250/4840262_plants-png-indoors-tropical-plant-png-hd-png.png "
-                        height="300" alt="" width="200" class="d-block mx-auto mb-4 rounded-pill">
+                        src="https://t4.ftcdn.net/jpg/02/17/88/73/360_F_217887350_mDfLv2ootQNeffWXT57VQr8OX7IvZKvB.jpg"
+                        height="300" alt="" width="350" class="d-block mx-auto mb-4 rounded-pill">
 
                     <!-- Default bootstrap file upload-->
 
@@ -79,7 +79,7 @@ Analyzer
     </div>
 </div>
 
-<script>
+<!-- <script>
     const actualBtn = document.getElementById('actual-btn');
 
     const fileChosen = document.getElementById('file-chosen');
@@ -87,6 +87,25 @@ Analyzer
     actualBtn.addEventListener('change', function () {
         fileChosen.textContent = this.files[0].name
     })
-</script>
+</script> -->
 
+<script>
+    const actualBtn = document.getElementById('actual-btn');
+    const fileChosen = document.getElementById('file-chosen');
+    const cameraBtn = document.getElementById('camera-btn');
+
+    // Event listener for file input change
+    actualBtn.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            // Check file size
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size exceeds 5MB. Please choose a smaller file.');
+                this.value = null; // Reset file input
+            } else {
+                fileChosen.textContent = file.name;
+            }
+        }
+    });
+</script>
 {% endblock body %}
