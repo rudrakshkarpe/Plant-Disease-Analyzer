@@ -10,7 +10,7 @@ Analyzer
         <!-- For demo purpose -->
         <div class="row mb-5 text-center text-white">
             <div class="col-lg-10 mx-auto">
-                <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(232, 236, 232);"><b> ☘️ Plant Disease Analyzer ☘️ </b></h1>
+                <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(232, 236, 232);"><b> Plant Disease Analyzer </b></h1>
                 <p class="lead" style="font-weight: 500;color: rgb(254, 255, 255);">Please upload your plant image here</p>
             </div>
         </div>
@@ -40,7 +40,12 @@ Analyzer
                     <form action="/submit" method="POST" enctype="multipart/form-data">
                         <div class="custom-file overflow-hidden mb-4">
                             <input type="file" id="actual-btn" hidden name="image" />
-                            <label for="actual-btn">Choose File</label>
+                            <label for="actual-btn">Upload Image</label>
+                            <span id="file-chosen">No file chosen</span>
+                        </div>
+                        <div class="custom-file overflow-hidden mb-4">
+                            <input type="file" id="actual-btn" hidden name="image" />
+                            <label for="actual-btn">Capture Image</label>
                             <span id="file-chosen">No file chosen</span>
                         </div>
 

@@ -1,15 +1,19 @@
 import os
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, url_for
 from PIL import Image
 import torchvision.transforms.functional as TF
 import algorithms.CNN as CNN
 import numpy as np
 import torch
 import pandas as pd
+import sqlite3
+from flask import make_response
+import pdfkit
 
-
+# load data
 disease_info = pd.read_csv('source/disease_info.csv' , encoding='cp1252')
 supplement_info = pd.read_csv('source/supplement_info.csv',encoding='cp1252')
+
 
 model = CNN.CNN(39)    
 model.load_state_dict(torch.load("models/plant_disease_recognizer.pt"))
@@ -23,7 +27,7 @@ def prediction(image_path):
     output = model(input_data)
     output = output.detach().numpy()
     index = np.argmax(output)
-    return index
+    return index    
 
 
 app = Flask(__name__)
@@ -40,9 +44,66 @@ def contact():
 def ai_engine_page():
     return render_template('index.html')
 
-@app.route('/mobile-device')
-def mobile_device_detected_page():
-    return render_template('mobile-device.html')
+# @app.route('/mobile-device')
+# def mobile_device_detected_page():
+#     return render_template('mobile-device.html')
+
+# Create a connection to the database
+conn = sqlite3.connect('login.db')
+c = conn.cursor()
+
+# Create a table to store login details
+c.execute('''CREATE TABLE IF NOT EXISTS users
+             (id INTEGER PRIMARY KEY AUTOINCREMENT,
+             email TEXT NOT NULL,
+             username TEXT NOT NULL,
+             password TEXT NOT NULL)''')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    if request.method == 'POST':
+        email = request.form['Email']
+        password = request.form['Password']
+        
+        # Check if the user exists in the database
+        c.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+        user = c.fetchone()
+        
+        if user:
+            # User exists, redirect to home page
+            return render_template('index.html')
+        else:
+            # User does not exist, show error message
+            error = 'Invalid email or password'
+            return render_template('login.html', error=error)
+    
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup_page():
+    if request.method == 'POST':
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Check if the email is already registered
+        c.execute("SELECT * FROM users WHERE email=?", (email,))
+        existing_user = c.fetchone()
+        
+        if existing_user:
+            # Email is already registered, show error message
+            error = 'Email already registered'
+            return render_template('signup.html', error=error)
+        else:
+            # Insert the new user into the database
+            c.execute("INSERT INTO users (email, username, password) VALUES (?, ?, ?)", (email, username, password))
+            conn.commit()
+            
+            # User successfully registered, redirect to login page
+            return render_template('login.html')
+    
+    return render_template('signup.html')
+
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit():
@@ -60,8 +121,23 @@ def submit():
         supplement_name = supplement_info['supplement name'][pred]
         supplement_image_url = supplement_info['supplement image'][pred]
         supplement_buy_link = supplement_info['buy link'][pred]
-        return render_template('submit.html' , title = title , desc = description , prevent = prevent , 
-                               image_url = image_url , pred = pred ,sname = supplement_name , simage = supplement_image_url , buy_link = supplement_buy_link)
+        
+        # Generate PDF report using Jinja template
+        rendered_template = render_template('submit.html', title=title, desc=description, prevent=prevent,
+                                            image_url=image_url, pred=pred, sname=supplement_name,
+                                            simage=supplement_image_url, buy_link=supplement_buy_link)
+        
+        # Create PDF file
+        pdf_file_path = os.path.join('static', 'reports', 'report.pdf')
+        pdfkit.from_string(rendered_template, pdf_file_path)
+        
+        # Provide download link to the PDF file
+        download_report = url_for('static', filename='reports/report.pdf')
+        
+        return render_template('submit.html', title=title, desc=description, prevent=prevent,
+                               image_url=image_url, pred=pred, sname=supplement_name,
+                               simage=supplement_image_url, buy_link=supplement_buy_link,
+                               download_report=download_report)
 
 @app.route('/market', methods=['GET', 'POST'])
 def market():
