@@ -1,5 +1,9 @@
 ## Plant Disease Detection & Medicine Recommendation System
 
+<details>
+
+<summary> Project Documentation 📄 </summary>
+
 ### Clone the repository
 
 ```bash
@@ -38,3 +42,4 @@ python app.py
 http://127.0.0.1/5000
 ```
 
+</details>
