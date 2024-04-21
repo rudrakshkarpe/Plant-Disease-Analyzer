@@ -14,6 +14,12 @@ source env/Scripts/activate
 pip install -r requirements.txt
 ```
 
+### Create Models directory and add from downloading to [this source]()
+
+```bash
+    mkdir models
+```
+
 ### Run the Application
 
 ```bash
