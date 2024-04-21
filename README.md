@@ -1,5 +1,11 @@
 ## Plant Disease Detection & Medicine Recommendation System
 
+### Clone the repository
+
+```bash
+git clone https://github.com/rudrakshkarpe/Plant-Disease-Analyzer.git
+```
+
 
 ### Create VENV and Install Required Libraries
 ```bash
