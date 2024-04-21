@@ -10,8 +10,10 @@ Analyzer
         <!-- For demo purpose -->
         <div class="row mb-5 text-center text-white">
             <div class="col-lg-10 mx-auto">
-                <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(232, 236, 232);"><b> Plant Disease Analyzer </b></h1>
-                <p class="lead" style="font-weight: 500;color: rgb(254, 255, 255);">Please upload your plant image here</p>
+                <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(232, 236, 232);"><b> Plant
+                        Disease Analyzer </b></h1>
+                <p class="lead" style="font-weight: 500;color: rgb(254, 255, 255);">Please upload your plant image here
+                </p>
             </div>
         </div>
         <!-- End -->
@@ -43,16 +45,29 @@ Analyzer
                             <label for="actual-btn">Upload Image</label>
                             <span id="file-chosen">No file chosen</span>
                         </div>
-                        <div class="custom-file overflow-hidden mb-4">
+                        <!-- <div class="custom-file overflow-hidden mb-4">
                             <input type="file" id="actual-btn" hidden name="image" />
                             <label for="actual-btn">Capture Image</label>
                             <span id="file-chosen">No file chosen</span>
+                        </div> -->
+                        <!-- Button to open the modal -->
+                        <button id="openModalBtn" class="btn btn-primary">Capture Image</button>
+
+                        <!-- The modal -->
+                        <div id="myModal" class="modal">
+                            <!-- Modal content -->
+                            <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <video id="video" width="50%" height="50%" autoplay></video>
+                                <br>
+                                <button id="captureBtn" class="btn btn-success">Capture</button>
+                            </div>
                         </div>
 
                         <!-- End -->
 
                         <h6 class="text-center mb-4 text-muted">
-                            Upload your plant's leaf image to analyze affected disease using AI. 
+                            Upload your plant's leaf image to analyze affected disease using AI.
                         </h6>
 
                         <!-- Custom bootstrap upload file-->
@@ -104,7 +119,7 @@ Analyzer
         const file = this.files[0];
         if (file) {
             // Check file size
-            if (file.size > 5 * 1024 * 1024) {
+            if (file.size > 10 * 1024 * 1024) {
                 alert('File size exceeds 5MB. Please choose a smaller file.');
                 this.value = null; // Reset file input
             } else {
@@ -113,4 +128,89 @@ Analyzer
         }
     });
 </script>
+
+<script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("openModalBtn");
+
+    // When the user clicks the button, open the modal 
+    btn.onclick = function () {
+        // Use navigator.mediaDevices.getUserMedia() to access the camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                // Get the video element
+                var video = document.getElementById('video');
+                // Assign the camera stream to the video element
+                video.srcObject = stream;
+                // Display the modal
+                modal.style.display = "block";
+            })
+            .catch(function (error) {
+                console.error('Error accessing the camera:', error);
+            });
+    }
+
+    // Function to close the modal and stop the camera stream
+    function closeModal() {
+        modal.style.display = "none";
+        // Stop the camera stream
+        var video = document.getElementById('video');
+        var stream = video.srcObject;
+        var tracks = stream.getTracks();
+        tracks.forEach(function (track) {
+            track.stop();
+        });
+        video.srcObject = null;
+    }
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        closeModal();
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+
+    // Function to capture image
+    document.getElementById('captureBtn').onclick = function () {
+        var video = document.getElementById('video');
+        var canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        var imgDataUrl = canvas.toDataURL('image/jpeg');
+
+        // Create a form and append the image data
+        var form = new FormData();
+        form.append('image', imgDataUrl);
+
+        // Submit the form via POST method
+        fetch('/submit', {
+            method: 'POST',
+            body: form
+        })
+            .then(response => {
+                // Handle the response here
+                console.log('Image submitted successfully');
+            })
+            .catch(error => {
+                // Handle errors here
+                console.error('Error submitting image:', error);
+            });
+
+        // Close the modal
+        closeModal();
+    }
+</script>
+
 {% endblock body %}
