@@ -24,7 +24,7 @@ source env/Scripts/activate
 pip install -r requirements.txt
 ```
 
-### Create Models directory and add from downloading to [this source](https://drive.google.com/drive/folders/1ewJWAiduGuld_9oGSrTuLumg9y62qS6A)
+### Create Models directory and add from downloading to [this source](NA)
 
 ```bash
 mkdir models
